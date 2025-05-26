@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePokemonDto } from './dto/create-pokemon.dto';
 import { UpdatePokemonDto } from './dto/update-pokemon.dto';
-import { PaginationDto } from 'src/shared/dtos/pagination.dto';
+import { PaginationDto } from '../shared/dtos/pagination.dto';
 import { PokeapiResponse } from './interfaces/pokeapi.response';
 import { Pokemon } from './entities/pokemon.entity';
 import { PokeapiPokemonResponse } from './interfaces/pokeapi-pokemon.response';
