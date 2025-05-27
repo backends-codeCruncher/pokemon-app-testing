@@ -3,6 +3,7 @@ import { PokemonsController } from './pokemons.controller';
 import { PokemonsService } from './pokemons.service';
 import { PaginationDto } from '../shared/dtos/pagination.dto';
 import { Pokemon } from './entities/pokemon.entity';
+import { UpdatePokemonDto } from './dto/update-pokemon.dto';
 
 const mockPokemons: Pokemon[] = [
   {
@@ -67,5 +68,42 @@ describe('PokemonsController', () => {
     const pokemons = await controller.findAll(dto);
 
     expect(pokemons).toBe(mockPokemons);
+  });
+
+  it('should have called the service with the correct id (findOne)', async () => {
+    const spy = jest
+      .spyOn(service, 'findOne')
+      .mockImplementation(() => Promise.resolve(mockPokemons[0]));
+
+    const id = 1;
+
+    const pokemon = await controller.findOne(id.toString());
+
+    expect(spy).toHaveBeenCalledWith(id);
+    expect(pokemon).toEqual(mockPokemons[0]);
+  });
+
+  it('should have called the service with the correct id and data (update)', async () => {
+    jest
+      .spyOn(service, 'update')
+      .mockImplementation(() => Promise.resolve(`Pokemon actualizado`));
+
+    const id = 1;
+    const data: UpdatePokemonDto = {};
+
+    const result = await controller.update(id.toString(), data);
+
+    expect(result).toBe('Pokemon actualizado');
+  });
+
+  it('should have called delete with the correct id (delete)', async () => {
+    jest
+      .spyOn(service, 'remove')
+      .mockImplementation(() => Promise.resolve(`Pokemon eliminado`));
+
+    const id = 2;
+    const result = await controller.remove(id.toString());
+
+    expect(result).toBe(`Pokemon eliminado`);
   });
 });
