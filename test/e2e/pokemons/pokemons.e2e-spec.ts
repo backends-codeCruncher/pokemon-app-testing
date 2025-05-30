@@ -78,4 +78,27 @@ describe('Pokemons (e2e)', () => {
       expect(pokemon).toHaveProperty('sprites');
     });
   });
+
+  it('/pokemons/:id (GET) - should return a pokemon by id', async () => {
+    const response = await request(app.getHttpServer()).get('/pokemons/25');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      id: 25,
+      name: 'pikachu',
+      type: 'electric',
+      hp: 35,
+      sprites: [
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/25.png',
+      ],
+    });
+  });
+
+  it('/pokemons/:id (GET) - should return Not Found', async () => {
+    const response = await request(app.getHttpServer()).get('/pokemons/2500');
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body.message).toBe('Pokemon with id 2500 not found');
+  });
 });
