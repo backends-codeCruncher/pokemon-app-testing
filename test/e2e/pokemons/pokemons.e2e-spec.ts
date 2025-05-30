@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../../../src/app.module';
 import { CreatePokemonDto } from '../../../src/pokemons/dto/create-pokemon.dto';
+import { Pokemon } from '../../../src/pokemons/entities/pokemon.entity';
 
 describe('Pokemons (e2e)', () => {
   let app: INestApplication<App>;
@@ -56,6 +57,25 @@ describe('Pokemons (e2e)', () => {
       hp: dto.hp ?? 0,
       sprites: dto.sprites ?? [],
       id: expect.any(Number),
+    });
+  });
+
+  it('/pokemons (GET) - should paginated list of pokemons', async () => {
+    const response = await request(app.getHttpServer()).get('/pokemons').query({
+      limit: 5,
+      page: 1,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBe(5);
+
+    (response.body as Pokemon[]).forEach((pokemon) => {
+      expect(pokemon).toHaveProperty('id');
+      expect(pokemon).toHaveProperty('name');
+      expect(pokemon).toHaveProperty('type');
+      expect(pokemon).toHaveProperty('hp');
+      expect(pokemon).toHaveProperty('sprites');
     });
   });
 });
