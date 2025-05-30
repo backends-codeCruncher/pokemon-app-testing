@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../../../src/app.module';
 import { CreatePokemonDto } from '../../../src/pokemons/dto/create-pokemon.dto';
+import { UpdatePokemonDto } from '../../../src/pokemons/dto/update-pokemon.dto';
 import { Pokemon } from '../../../src/pokemons/entities/pokemon.entity';
 
 describe('Pokemons (e2e)', () => {
@@ -96,9 +97,84 @@ describe('Pokemons (e2e)', () => {
   });
 
   it('/pokemons/:id (GET) - should return Not Found', async () => {
-    const response = await request(app.getHttpServer()).get('/pokemons/2500');
+    const pokemonId = 2500;
+
+    const response = await request(app.getHttpServer()).get(
+      `/pokemons/${pokemonId}`,
+    );
 
     expect(response.statusCode).toBe(404);
-    expect(response.body.message).toBe('Pokemon with id 2500 not found');
+    expect(response.body.message).toBe(
+      `Pokemon with id ${pokemonId} not found`,
+    );
+  });
+
+  it('/pokemons/:id (PATCH) - should update pokemon', async () => {
+    const dto: UpdatePokemonDto = {
+      name: 'Pikachu Omega',
+    };
+
+    const pokemonId = 25;
+
+    const response = await request(app.getHttpServer())
+      .patch(`/pokemons/${pokemonId}`)
+      .send(dto);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      id: 25,
+      name: dto.name,
+      type: 'electric',
+      hp: 35,
+      sprites: [
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/25.png',
+      ],
+    });
+  });
+
+  it('/pokemons/:id (PATCH) - should throw an 404', async () => {
+    const dto: UpdatePokemonDto = {
+      name: 'Pikachu Omega',
+    };
+
+    const pokemonId = 2500;
+
+    const response = await request(app.getHttpServer())
+      .patch(`/pokemons/${pokemonId}`)
+      .send(dto);
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toEqual({
+      message: `Pokemon with id ${pokemonId} not found`,
+      error: 'Not Found',
+      statusCode: 404,
+    });
+  });
+
+  it('/pokemons/:id (DELETE) - should remove pokemon', async () => {
+    const pokemonId = 25;
+
+    const response = await request(app.getHttpServer()).delete(
+      `/pokemons/${pokemonId}`,
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.text).toBe('Pokemon pikachu removed!');
+  });
+
+  it('/pokemons/:id (DELETE) - should throw an 404', async () => {
+    const pokemonId = 2500;
+
+    const response = await request(app.getHttpServer()).delete(
+      `/pokemons/${pokemonId}`,
+    );
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toEqual({
+      message: `Pokemon with id ${pokemonId} not found`,
+      error: 'Not Found',
+      statusCode: 404,
+    });
   });
 });
